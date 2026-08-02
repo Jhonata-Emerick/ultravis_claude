@@ -4,9 +4,6 @@ import { routing } from '@/i18n/routing';
 import { updateSession } from '@/lib/supabase/middleware';
 
 const intlMiddleware = createMiddleware(routing);
-
-export const runtime = 'edge';
-
 const protectedPathnames = ['/dashboard'];
 const authPathnames = ['/sign-in', '/sign-up'];
 
