@@ -13,6 +13,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+        "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+        "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+        "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
@@ -57,6 +60,8 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+        "@opennextjs/cloudflare": "latest",
+        "wrangler": "^4.118.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
