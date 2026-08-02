@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { siteConfig } from '@/config/site';
+import { LocaleSwitcher } from './locale-switcher';
 
 export function MarketingHeader() {
   const t = useTranslations('auth');
@@ -23,6 +24,7 @@ export function MarketingHeader() {
         </a>
 
         <div className="flex items-center gap-3">
+          <LocaleSwitcher />
           <Link href="/sign-in">
             <Button variant="ghost" size="sm">
               {t('signIn')}
