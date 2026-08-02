@@ -12,22 +12,14 @@ export function MarketingHeader() {
       <div className="container flex h-16 items-center justify-between">
         <a href={siteConfig.url} className="flex items-center gap-2">
           <Image
-            src="/logo_light.svg"
-            alt=""
+            src="/logo_ultravis.png"
+            alt="Ultravis"
             width={28}
             height={28}
-            className="h-7 w-7 shrink-0 dark:hidden"
+            className="h-7 w-7 shrink-0 rounded-full object-cover"
             priority
           />
-          <Image
-            src="/logo_dark.svg"
-            alt=""
-            width={28}
-            height={28}
-            className="hidden h-7 w-7 shrink-0 dark:block"
-            priority
-          />
-          <span className="text-xl font-bold tracking-tight">{siteConfig.name}</span>
+          <span className="text-xl font-bold tracking-tight">Ultravis</span>
         </a>
 
         <div className="flex items-center gap-3">
