@@ -1,3 +1,5 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
 
