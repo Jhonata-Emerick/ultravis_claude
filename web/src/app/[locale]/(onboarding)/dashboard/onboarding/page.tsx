@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { createBrand } from '@/lib/actions/brand';
@@ -118,6 +119,7 @@ function TopicAccordion({
   onAddPrompt: (prompt: string) => void;
   onRemovePrompt: (index: number) => void;
 }) {
+  const t = useTranslations('onboarding.step4');
   const [open, setOpen] = useState(defaultOpen);
   const [newPrompt, setNewPrompt] = useState('');
 
@@ -142,7 +144,7 @@ function TopicAccordion({
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           )}
           <span className="font-medium">{data.topic}</span>
-          <span className="text-xs text-muted-foreground">{data.prompts.length} prompts</span>
+          <span className="text-xs text-muted-foreground">{t('promptsCount', { count: data.prompts.length })}</span>
         </button>
         <DropdownMenu>
           <DropdownMenuTrigger className="p-1 rounded hover:bg-muted text-muted-foreground">
@@ -153,7 +155,7 @@ function TopicAccordion({
               className="text-destructive focus:text-destructive"
               onClick={onRemoveTopic}
             >
-              Remove topic
+              {t('removeTopic')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -176,7 +178,7 @@ function TopicAccordion({
           ))}
           <div className="flex items-center gap-2 mt-2">
             <Input
-              placeholder="Enter new prompt..."
+              placeholder={t('addPromptPlaceholder')}
               value={newPrompt}
               onChange={(e) => setNewPrompt(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
@@ -203,28 +205,27 @@ function TopicAccordion({
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const TOPIC_LOADING_MESSAGES = [
-  'Researching topics for your brand...',
-  'Analyzing your industry landscape...',
-  'Identifying key themes and trends...',
-  'Finding what your audience cares about...',
-  'Evaluating competitive topics...',
-  'Almost there, finalizing suggestions...',
-];
-
-const COMPETITOR_LOADING_MESSAGES = [
-  'Searching for competitors...',
-  'Analyzing your market...',
-  'Identifying key players...',
-  'Verifying company details...',
-  'Finalizing recommendations...',
-];
-
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { addBrand, setActiveBrand } = useBrandStore();
+  const t = useTranslations('onboarding');
+  const topicLoadingMessages = [
+    t('step3.loading1'),
+    t('step3.loading2'),
+    t('step3.loading3'),
+    t('step3.loading4'),
+    t('step3.loading5'),
+    t('step3.loading6'),
+  ];
+  const competitorLoadingMessages = [
+    t('step5.loading1'),
+    t('step5.loading2'),
+    t('step5.loading3'),
+    t('step5.loading4'),
+    t('step5.loading5'),
+  ];
 
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -258,12 +259,12 @@ export default function OnboardingPage() {
       topicMsgIdx.current = 0;
       return;
     }
-    setTopicLoadingMsg(TOPIC_LOADING_MESSAGES[0]);
+    setTopicLoadingMsg(topicLoadingMessages[0]);
     topicMsgIdx.current = 0;
 
     const interval = setInterval(() => {
-      topicMsgIdx.current = (topicMsgIdx.current + 1) % TOPIC_LOADING_MESSAGES.length;
-      setTopicLoadingMsg(TOPIC_LOADING_MESSAGES[topicMsgIdx.current]);
+      topicMsgIdx.current = (topicMsgIdx.current + 1) % topicLoadingMessages.length;
+      setTopicLoadingMsg(topicLoadingMessages[topicMsgIdx.current]);
     }, 2500);
 
     return () => clearInterval(interval);
@@ -317,13 +318,13 @@ export default function OnboardingPage() {
       competitorMsgIdx.current = 0;
       return;
     }
-    setCompetitorLoadingMsg(COMPETITOR_LOADING_MESSAGES[0]);
+    setCompetitorLoadingMsg(competitorLoadingMessages[0]);
     competitorMsgIdx.current = 0;
 
     const interval = setInterval(() => {
       competitorMsgIdx.current =
-        (competitorMsgIdx.current + 1) % COMPETITOR_LOADING_MESSAGES.length;
-      setCompetitorLoadingMsg(COMPETITOR_LOADING_MESSAGES[competitorMsgIdx.current]);
+        (competitorMsgIdx.current + 1) % competitorLoadingMessages.length;
+      setCompetitorLoadingMsg(competitorLoadingMessages[competitorMsgIdx.current]);
     }, 2500);
 
     return () => clearInterval(interval);
@@ -749,7 +750,7 @@ export default function OnboardingPage() {
         setSaveError(
           result.code === 'plan_limit'
             ? result.error
-            : "We couldn't save your prompts — please try again.",
+            : t('step4.genericSaveError'),
         );
         return;
       }
@@ -764,7 +765,7 @@ export default function OnboardingPage() {
       setStep(5);
       fetchCompetitorSuggestions();
     } catch {
-      setSaveError("We couldn't save your prompts — please try again.");
+      setSaveError(t('step4.genericSaveError'));
     } finally {
       setIsLoading(false);
     }
@@ -989,18 +990,16 @@ export default function OnboardingPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Globe className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Set up your brand</h1>
-            <p className="text-sm text-muted-foreground">
-              See how AI platforms talk about you. Add your first brand to get started.
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight">{t('step1.title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('step1.subtitle')}</p>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="brandName">Brand name</Label>
+              <Label htmlFor="brandName">{t('step1.brandName')}</Label>
               <Input
                 id="brandName"
-                placeholder="e.g. Acme Corp"
+                placeholder={t('step1.brandNamePlaceholder')}
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
                 autoFocus
@@ -1008,14 +1007,14 @@ export default function OnboardingPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
+              <Label htmlFor="website">{t('step1.website')}</Label>
               <div className="flex">
                 <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
                   https://
                 </span>
                 <Input
                   id="website"
-                  placeholder="example.com"
+                  placeholder={t('step1.websitePlaceholder')}
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                   className="rounded-l-none"
@@ -1025,18 +1024,18 @@ export default function OnboardingPage() {
 
             <div className="space-y-2">
               <Label htmlFor="description">
-                Describe your brand <span className="text-muted-foreground">(optional)</span>
+                {t('step1.description')} <span className="text-muted-foreground">{t('step1.optional')}</span>
               </Label>
               <Textarea
                 id="description"
-                placeholder="A brief description helps us generate better suggestions."
+                placeholder={t('step1.descriptionPlaceholder')}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
               />
               <ul className="text-xs text-muted-foreground space-y-1 list-disc ml-4">
-                <li>What industry are you in?</li>
-                <li>Who is your target audience?</li>
+                <li>{t('step1.industryQuestion')}</li>
+                <li>{t('step1.audienceQuestion')}</li>
               </ul>
             </div>
 
@@ -1057,7 +1056,7 @@ export default function OnboardingPage() {
                 setStep(2);
               }}
             >
-              Continue
+              {t('step1.continue')}
             </Button>
           </div>
         </div>
@@ -1076,16 +1075,13 @@ export default function OnboardingPage() {
           <BrandHeader name={brandName} domain={domain} />
 
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Select your target market</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Pick the region and language your audience uses. This helps us deliver more accurate
-              AI visibility data.
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight">{t('step2.title')}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t('step2.subtitle')}</p>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Region</Label>
+              <Label>{t('step2.region')}</Label>
               <Select value={region} onValueChange={(v) => v && setRegion(v)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -1101,7 +1097,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Language</Label>
+              <Label>{t('step2.language')}</Label>
               <Select value={language} onValueChange={(v) => v && setLanguage(v)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -1120,10 +1116,10 @@ export default function OnboardingPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Setting up...
+                  {t('step2.settingUp')}
                 </>
               ) : (
-                'Continue'
+                t('step2.continue')
               )}
             </Button>
           </div>
@@ -1135,7 +1131,7 @@ export default function OnboardingPage() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('back')}
           </button>
           <StepDots current={2} total={totalSteps} />
           <div className="w-12" />
@@ -1155,9 +1151,9 @@ export default function OnboardingPage() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
             <div className="lg:col-span-3 space-y-6">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Choose topics to monitor</h1>
+                <h1 className="text-2xl font-bold tracking-tight">{t('step3.title')}</h1>
                 <div className="flex items-center gap-2 mt-3">
-                  <span className="text-sm text-muted-foreground">Select up to 10 topics</span>
+                  <span className="text-sm text-muted-foreground">{t('step3.selectUpTo')}</span>
                   <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-full transition-all"
@@ -1181,10 +1177,10 @@ export default function OnboardingPage() {
                   {topicSuggestError && (
                     <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
                       <span>
-                        Couldn&apos;t fetch topic suggestions right now — add your own below.
+                        {t('step3.suggestError')}
                       </span>
                       <Button variant="outline" size="sm" onClick={fetchTopicSuggestions}>
-                        Try again
+                        {t('step3.tryAgain')}
                       </Button>
                     </div>
                   )}
@@ -1218,7 +1214,7 @@ export default function OnboardingPage() {
 
                   <div className="flex items-center gap-2 pt-2">
                     <Input
-                      placeholder="Add custom topic..."
+                      placeholder={t('step3.addCustomPlaceholder')}
                       value={customTopic}
                       onChange={(e) => setCustomTopic(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && addCustomTopic()}
@@ -1244,45 +1240,42 @@ export default function OnboardingPage() {
                 {loadingPrompts ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating prompts...
+                    {t('step3.generating')}
                   </>
                 ) : (
-                  'Looks good'
+                  t('step3.looksGood')
                 )}
               </Button>
             </div>
 
             <div className="lg:col-span-2">
               <div className="rounded-xl border bg-card p-5 sticky top-10">
-                <h3 className="text-sm font-semibold mb-4">Topic Selection Tips</h3>
+                <h3 className="text-sm font-semibold mb-4">{t('step3.tipsTitle')}</h3>
                 <div className="space-y-4">
                   <div className="flex gap-3">
                     <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">5 prompts are created per topic</p>
+                      <p className="text-sm font-medium">{t('step3.tip1Title')}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        You can select up to 10 topics for a total of 50 prompts. More can be added
-                        anytime from the dashboard.
+                        {t('step3.tip1Body')}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">Think like your customers</p>
+                      <p className="text-sm font-medium">{t('step3.tip2Title')}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Use terms your audience would search for when looking for products or
-                        services like yours.
+                        {t('step3.tip2Body')}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">Keep it short</p>
+                      <p className="text-sm font-medium">{t('step3.tip3Title')}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Topics should be concise — we&apos;ll turn them into detailed prompts in the
-                        next step.
+                        {t('step3.tip3Body')}
                       </p>
                     </div>
                   </div>
@@ -1298,7 +1291,7 @@ export default function OnboardingPage() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('back')}
           </button>
           <StepDots current={3} total={totalSteps} />
           <div className="w-12" />
@@ -1317,11 +1310,8 @@ export default function OnboardingPage() {
 
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Review your prompts</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                These prompts will be sent to AI platforms daily. Feel free to edit, add, or remove
-                any before starting.
-              </p>
+              <h1 className="text-2xl font-bold tracking-tight">{t('step4.title')}</h1>
+              <p className="text-sm text-muted-foreground mt-1">{t('step4.subtitle')}</p>
             </div>
             <Button
               onClick={handleSavePromptsAndContinue}
@@ -1330,24 +1320,23 @@ export default function OnboardingPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving prompts...
+                  {t('step4.saving')}
                 </>
               ) : (
-                'Continue'
+                t('step4.continue')
               )}
             </Button>
           </div>
 
           {promptGenError && (
             <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
-              Couldn&apos;t generate prompt suggestions right now — add your own to each topic below
-              to continue.
+              {t('step4.generateError')}
             </div>
           )}
 
           {excessPrompts > 0 && (
             <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
-              Your plan includes up to {promptLimit} prompts — remove {excessPrompts} to continue.
+              {t('step4.planLimitWarning', { limit: promptLimit, excess: excessPrompts })}
             </div>
           )}
 
@@ -1358,13 +1347,13 @@ export default function OnboardingPage() {
           )}
 
           <div className="mb-4">
-            <p className="text-sm font-medium">Your Prompt List</p>
-            <p className="text-xs text-muted-foreground">{totalPrompts} prompts total</p>
+            <p className="text-sm font-medium">{t('step4.promptListTitle')}</p>
+            <p className="text-xs text-muted-foreground">{t('step4.promptsTotal', { count: totalPrompts })}</p>
           </div>
 
           <div className="rounded-lg border">
             <div className="flex items-center gap-4 px-4 py-2.5 border-b bg-muted/50 text-xs font-medium text-muted-foreground">
-              <span className="flex-1">Topic</span>
+              <span className="flex-1">{t('step4.topicColumn')}</span>
             </div>
             {topicPrompts.map((tp, idx) => (
               <TopicAccordion
@@ -1378,7 +1367,7 @@ export default function OnboardingPage() {
             ))}
             {topicPrompts.length === 0 && (
               <div className="py-8 text-center text-sm text-muted-foreground">
-                No prompts generated yet.
+                {t('step4.noPrompts')}
               </div>
             )}
           </div>
@@ -1390,7 +1379,7 @@ export default function OnboardingPage() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('back')}
           </button>
           <StepDots current={4} total={totalSteps} />
           <div className="w-12" />
@@ -1411,10 +1400,8 @@ export default function OnboardingPage() {
           <BrandHeader name={brandName} domain={domain} />
 
           <div className="mb-6">
-            <h1 className="text-2xl font-bold tracking-tight">Add your competitors</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              We&apos;ll track how often competitors appear alongside your brand in AI responses.
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight">{t('step5.title')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('step5.subtitle')}</p>
           </div>
 
           {loadingCompetitors ? (
@@ -1429,17 +1416,17 @@ export default function OnboardingPage() {
               {competitorSuggestError && (
                 <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
                   <span>
-                    Couldn&apos;t fetch competitor suggestions right now — add your own below.
+                    {t('step5.suggestError')}
                   </span>
                   <Button variant="outline" size="sm" onClick={fetchCompetitorSuggestions}>
-                    Try again
+                    {t('step5.tryAgain')}
                   </Button>
                 </div>
               )}
               {suggestedCompetitors.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Suggested competitors
+                    {t('step5.suggestedTitle')}
                   </p>
                   {suggestedCompetitors.map((c, idx) => (
                     <div
@@ -1495,17 +1482,17 @@ export default function OnboardingPage() {
 
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Add manually
+                  {t('step5.addManually')}
                 </p>
                 <div className="flex items-center gap-2">
                   <Input
-                    placeholder="Company name"
+                    placeholder={t('step5.companyName')}
                     value={competitorName}
                     onChange={(e) => setCompetitorName(e.target.value)}
                     className="text-sm"
                   />
                   <Input
-                    placeholder="domain.com"
+                    placeholder={t('step5.domainPlaceholder')}
                     value={competitorDomain}
                     onChange={(e) => setCompetitorDomain(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && addManualCompetitor()}
@@ -1530,13 +1517,15 @@ export default function OnboardingPage() {
                 {savingCompetitors ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Finishing setup...
-                  </>
-                ) : hasSelectedCompetitors ? (
-                  `Start tracking with ${selectedCompetitorCount} competitor${selectedCompetitorCount !== 1 ? 's' : ''}`
-                ) : (
-                  'Add a competitor to continue'
-                )}
+                    {t('step5.finishing')}
+                </>
+              ) : hasSelectedCompetitors ? (
+                selectedCompetitorCount !== 1
+                  ? t('step5.startTrackingPlural', { count: selectedCompetitorCount })
+                  : t('step5.startTracking', { count: selectedCompetitorCount })
+              ) : (
+                t('step5.addToContinue')
+              )}
               </Button>
             </div>
           )}
@@ -1548,7 +1537,7 @@ export default function OnboardingPage() {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('back')}
           </button>
           <StepDots current={5} total={totalSteps} />
           <div className="w-12" />
@@ -1565,11 +1554,8 @@ export default function OnboardingPage() {
     <div className="flex min-h-svh flex-col p-6 md:p-10">
       <div className="mx-auto w-full max-w-2xl flex-1">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold tracking-tight">Choose your plan</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Start your 14-day free trial — your card won&apos;t be charged until the trial ends.
-            Cancel anytime in Settings → Billing.
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('step6.title')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('step6.subtitle')}</p>
         </div>
 
         {/* Plan cards */}
@@ -1590,7 +1576,7 @@ export default function OnboardingPage() {
                 )}
               >
                 {plan.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Most Popular</Badge>
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">{t('step6.mostPopular')}</Badge>
                 )}
 
                 <div className="mb-4">
@@ -1600,7 +1586,7 @@ export default function OnboardingPage() {
 
                 <div className="flex items-end gap-1 mb-4">
                   <span className="text-4xl font-bold tracking-tight">${price.monthly}</span>
-                  <span className="mb-1 text-sm text-muted-foreground">/month</span>
+                  <span className="mb-1 text-sm text-muted-foreground">{t('step6.perMonth')}</span>
                 </div>
 
                 <Button
@@ -1612,10 +1598,10 @@ export default function OnboardingPage() {
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Redirecting...
+                      {t('step6.redirecting')}
                     </>
                   ) : (
-                    'Start Free Trial'
+                    t('step6.startTrial')
                   )}
                 </Button>
 
@@ -1626,16 +1612,16 @@ export default function OnboardingPage() {
                     <strong>
                       {plan.limits.maxBrands === -1 ? 'Unlimited' : plan.limits.maxBrands}
                     </strong>{' '}
-                    {plan.limits.maxBrands === 1 ? 'brand' : 'brands'}
+                    {plan.limits.maxBrands === 1 ? t('step6.brand') : t('step6.brands')}
                   </PlanFeatureItem>
                   <PlanFeatureItem>
                     <strong>
                       {plan.limits.maxPrompts === -1 ? 'Unlimited' : plan.limits.maxPrompts}
                     </strong>{' '}
-                    prompts tracked
+                    {t('step6.promptsTracked')}
                   </PlanFeatureItem>
                   <PlanFeatureItem>
-                    <strong>{plan.limits.maxPlatforms}</strong> answer engines
+                    <strong>{plan.limits.maxPlatforms}</strong> {t('step6.answerEngines')}
                     {plan.limits.allowedScrapers && plan.limits.allowedScrapers.length > 0 && (
                       <span className="text-muted-foreground font-normal">
                         {' '}
@@ -1654,23 +1640,23 @@ export default function OnboardingPage() {
                     <strong>
                       {plan.limits.maxTeamMembers === -1 ? 'Unlimited' : plan.limits.maxTeamMembers}
                     </strong>{' '}
-                    team members
+                    {t('step6.teamMembers')}
                   </PlanFeatureItem>
                   <PlanFeatureItem>
                     {plan.limits.features.includes('daily_monitoring')
-                      ? 'Daily monitoring'
-                      : 'Weekly monitoring'}
+                      ? t('step6.dailyMonitoring')
+                      : t('step6.weeklyMonitoring')}
                   </PlanFeatureItem>
                   {plan.limits.features.includes('competitor_tracking') && (
-                    <PlanFeatureItem>Competitor tracking</PlanFeatureItem>
+                    <PlanFeatureItem>{t('step6.competitorTracking')}</PlanFeatureItem>
                   )}
                   {plan.limits.features.includes('content_optimization') && (
-                    <PlanFeatureItem>Content optimization</PlanFeatureItem>
+                    <PlanFeatureItem>{t('step6.contentOptimization')}</PlanFeatureItem>
                   )}
                   {plan.limits.features.includes('advanced_analytics') && (
-                    <PlanFeatureItem>Advanced analytics</PlanFeatureItem>
+                    <PlanFeatureItem>{t('step6.advancedAnalytics')}</PlanFeatureItem>
                   )}
-                  <PlanFeatureItem>Email support</PlanFeatureItem>
+                  <PlanFeatureItem>{t('step6.emailSupport')}</PlanFeatureItem>
                 </div>
               </div>
             );
@@ -1678,14 +1664,14 @@ export default function OnboardingPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Need more?{' '}
+          {t('step6.needMore')}{' '}
           <a href="mailto:sales@ansvisor.com" className="underline hover:text-foreground">
-            Contact sales
+            {t('step6.contactSales')}
           </a>{' '}
-          for Enterprise pricing.
+          {t('step6.forEnterprise')}
         </p>
         <p className="mt-2 text-center text-xs text-muted-foreground">
-          Secure payments powered by Stripe.
+          {t('step6.securePayments')}
         </p>
       </div>
 
@@ -1695,7 +1681,7 @@ export default function OnboardingPage() {
           className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Back
+          {t('back')}
         </button>
         <StepDots current={6} total={totalSteps} />
         <div className="w-12" />
