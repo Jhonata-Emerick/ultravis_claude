@@ -1336,7 +1336,7 @@ export default function OnboardingPage() {
 
           {excessPrompts > 0 && (
             <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
-              {t('step4.planLimitWarning', { limit: promptLimit, excess: excessPrompts })}
+              {t('step4.planLimitWarning', { limit: promptLimit ?? 0, excess: excessPrompts })}
             </div>
           )}
 
