@@ -47,10 +47,10 @@ export default async function OnboardingLayout({ children }: { children: React.R
   }
 
   return (
-    <>
+    <div className="ultravis-auth-theme min-h-screen bg-background text-foreground">
       <AuthProvider user={user} />
       <OnboardingSignOutButton />
       {children}
-    </>
+    </div>
   );
 }
